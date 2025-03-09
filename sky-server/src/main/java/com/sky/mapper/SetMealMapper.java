@@ -8,6 +8,7 @@ import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import com.sky.enumeration.OperationType;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -32,4 +33,10 @@ public interface SetMealMapper {
     SetMeal getById(Long id);
 
     void deleteBatch(List<Long> ids);
+
+    @AutoFill(value = OperationType.UPDATE)
+    void update(SetMeal setMeal);
+
+    @Update("update setmeal set status = #{status} where id = #{id}")
+    void setStatus(Integer status, Long id);
 }

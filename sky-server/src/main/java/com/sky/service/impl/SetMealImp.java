@@ -13,7 +13,6 @@ import com.sky.mapper.SetMealDishMapper;
 import com.sky.mapper.SetMealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
-import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +68,38 @@ public class SetMealImp implements SetMealService {
 
         setMealDishMapper.deleteBatch(ids);
         setMealMapper.deleteBatch(ids);
+    }
+
+    @Override
+    public void update(SetMealDTO setmealDTO) {
+        SetMeal setMeal = new SetMeal();
+        BeanUtils.copyProperties(setmealDTO, setMeal);
+        setMealDishMapper.deleteBySetMealId(setmealDTO.getId());
+        setMealMapper.update(setMeal);
+
+        List<SetMealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if (setmealDishes != null && !setmealDishes.isEmpty()){
+            setmealDishes.forEach(setMealDish -> {
+                setMealDish.setSetmealId(setmealDTO.getId());
+            });
+            setMealDishMapper.insertBatch(setmealDishes);
+        }
+    }
+
+    @Override
+    public SetmealVO getById(Long id) {
+        SetMeal setMeal = setMealMapper.getById(id);
+        if (setMeal != null){
+            SetmealVO setmealVO = new SetmealVO();
+            BeanUtils.copyProperties(setMeal, setmealVO);
+            setmealVO.setSetmealDishes(setMealDishMapper.getBySetMealId(id));
+            return setmealVO;
+        }
+        return null;
+    }
+
+    @Override
+    public void setStatus(Integer status, Long id) {
+        setMealMapper.setStatus(status, id);
     }
 }
