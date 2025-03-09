@@ -9,10 +9,12 @@ import com.sky.dto.SetMealPageQueryDTO;
 import com.sky.entity.SetMeal;
 import com.sky.entity.SetMealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetMealDishMapper;
 import com.sky.mapper.SetMealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class SetMealImp implements SetMealService {
     private SetMealMapper setMealMapper;
     @Autowired
     private SetMealDishMapper setMealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
 
     @Override
@@ -101,5 +105,15 @@ public class SetMealImp implements SetMealService {
     @Override
     public void setStatus(Integer status, Long id) {
         setMealMapper.setStatus(status, id);
+    }
+
+    @Override
+    public List<SetMeal> list(SetMeal setMeal) {
+        return setMealMapper.list(setMeal);
+    }
+
+    @Override
+    public List<DishItemVO> getDishItemById(Long id) {
+        return dishMapper.getDishItemById(id);
     }
 }

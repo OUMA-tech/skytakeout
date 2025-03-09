@@ -44,4 +44,19 @@
         </set>
         where id = #{id}
     </update>
+
+    <select id="list" parameterType="SetMeal" resultType="SetMeal">
+        select * from setmeal
+        <where>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
 </mapper>

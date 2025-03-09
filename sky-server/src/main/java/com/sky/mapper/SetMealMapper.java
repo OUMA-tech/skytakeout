@@ -39,4 +39,6 @@ public interface SetMealMapper {
 
     @Update("update setmeal set status = #{status} where id = #{id}")
     void setStatus(Integer status, Long id);
+
+    List<SetMeal> list(SetMeal setMeal);
 }
