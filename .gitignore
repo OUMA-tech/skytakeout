@@ -1,4 +1,5 @@
 **/target/
+sky-server/src/main/resources/application-dev.yml
 .idea
 *.iml
 *.class
