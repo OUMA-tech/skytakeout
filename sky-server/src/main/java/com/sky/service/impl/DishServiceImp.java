@@ -13,16 +13,19 @@ import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetMealDishMapper;
 import com.sky.result.PageResult;
+import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -33,6 +36,8 @@ public class DishServiceImp implements DishService {
     DishFlavorMapper dishFlavorMapper;
     @Autowired
     SetMealDishMapper setMealDishMapper;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     public void saveWithFlavor(DishDTO dishDTO) {
@@ -48,6 +53,10 @@ public class DishServiceImp implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);
         }
+
+        // refresh cache
+        String key = "dish_" + dishDTO.getCategoryId();
+        redisTemplate.delete(key);
     }
 
     @Override
@@ -80,6 +89,9 @@ public class DishServiceImp implements DishService {
 //        }
         dishMapper.deleteBatch(ids);
         dishFlavorMapper.deleteBatch(ids);
+
+        // refresh cache
+        cleanCache("dish_*");
     }
 
     @Override
@@ -110,11 +122,17 @@ public class DishServiceImp implements DishService {
             });
             dishFlavorMapper.insertBatch(flavors);
         }
+
+        // refresh cache
+        cleanCache("dish_*");
     }
 
     @Override
     public void setStatus(Integer status, Long id) {
         dishMapper.setStatus(status, id);
+
+        // refresh cache
+        cleanCache("dish_*");
     }
 
     @Override
@@ -139,6 +157,26 @@ public class DishServiceImp implements DishService {
             dishVOList.add(dishVO);
         }
         return dishVOList;
+    }
+
+    @Override
+    public List<DishVO> listWithFlavorUser(Long categoryId) {
+
+        String key = "dish_" + categoryId;
+        List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
+        if (list != null && !list.isEmpty()) {
+            return list;
+        }
+
+        list = listWithFlavor(categoryId);
+        redisTemplate.opsForValue().set(key, list);
+
+        return list;
+    }
+
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 
 }
