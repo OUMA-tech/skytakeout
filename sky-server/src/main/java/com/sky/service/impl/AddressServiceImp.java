@@ -6,6 +6,7 @@ import com.sky.mapper.AddressMapper;
 import com.sky.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class AddressServiceImp implements AddressService {
     }
 
     @Override
+    @Transactional
     public void setDefault(AddressBook addressBook) {
         addressBook.setIsDefault(0);
         addressBook.setUserId(BaseContext.getCurrentId());
