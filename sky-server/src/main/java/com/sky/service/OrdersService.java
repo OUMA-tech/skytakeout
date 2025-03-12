@@ -1,7 +1,6 @@
 package com.sky.service;
 
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
@@ -21,4 +20,14 @@ public interface OrdersService {
     PageResult adminConditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 
     OrderStatisticsVO adminStatistics();
+
+    void adminConfirmOrder(OrdersDTO ordersDTO);
+
+    void adminRejectOrder(OrdersRejectionDTO ordersRejectionDTO);
+
+    void adminCancelOrder(OrdersCancelDTO ordersCancelDTO);
+
+    void adminDeliveryOrder(Long id);
+
+    void adminCompleteOrder(Long id);
 }

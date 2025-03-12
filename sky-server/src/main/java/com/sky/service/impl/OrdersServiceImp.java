@@ -4,8 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
@@ -22,6 +21,7 @@ import com.sky.service.OrdersService;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -208,6 +207,97 @@ public class OrdersServiceImp implements OrdersService {
         orderStatisticsVO.setDeliveryInProgress(deliveryInProgressOrder);
         orderStatisticsVO.setToBeConfirmed(toBeConfirmedOrder);
         return orderStatisticsVO;
+    }
+
+    @Override
+    public void adminConfirmOrder(OrdersDTO ordersDTO) {
+        Long orderId = ordersDTO.getId();
+        Orders orders = ordersMapper.getById(orderId);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (orders.getStatus() != 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders ordersUpdate = new Orders();
+        ordersUpdate.setId(orderId);
+        ordersUpdate.setStatus(Orders.CONFIRMED);
+        ordersMapper.update(ordersUpdate);
+    }
+
+    @Override
+    public void adminRejectOrder(OrdersRejectionDTO ordersRejectionDTO) {
+        Long orderId = ordersRejectionDTO.getId();
+        Orders orders = ordersMapper.getById(orderId);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (orders.getStatus() != 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // deal with refund logic
+//        Integer payStatus = orders.getPayStatus();
+//        if (payStatus == Orders.PAID) {
+//
+//        }
+
+        // update orders database
+        Orders ordersUpdate = Orders.builder()
+                .id(orderId)
+                .status(Orders.CANCELLED)
+                .rejectionReason(ordersRejectionDTO.getRejectionReason())
+                .cancelTime(LocalDateTime.now())
+                .build();
+        ordersMapper.update(ordersUpdate);
+    }
+
+    @Override
+    public void adminCancelOrder(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders = ordersMapper.getById(ordersCancelDTO.getId());
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (orders.getStatus() > 3) {
+            // order status 1 waiting payment 2 waiting accept by shop 3 accepted 4 delivering 5 finished 6 canceled
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders ordersUpdate = Orders.builder()
+                .id(ordersCancelDTO.getId())
+                .status(Orders.CANCELLED)
+                .cancelReason(ordersCancelDTO.getCancelReason())
+                .cancelTime(LocalDateTime.now())
+                .build();
+        ordersMapper.update(ordersUpdate);
+    }
+
+    @Override
+    public void adminDeliveryOrder(Long id) {
+        Orders orders = ordersMapper.getById(id);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (!orders.getStatus().equals(Orders.CONFIRMED)) {
+            // order status 1 waiting payment 2 waiting accept by shop 3 accepted 4 delivering 5 finished 6 canceled
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders ordersUpdate = Orders.builder()
+                .id(id)
+                .status(Orders.DELIVERY_IN_PROGRESS)
+                .build();
+        ordersMapper.update(ordersUpdate);
+    }
+
+    @Override
+    public void adminCompleteOrder(Long id) {
+        Orders orders = ordersMapper.getById(id);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (!orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            // order status 1 waiting payment 2 waiting accept by shop 3 accepted 4 delivering 5 finished 6 canceled
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders ordersUpdate = Orders.builder()
+                .id(id)
+                .status(Orders.COMPLETED)
+                .deliveryTime(LocalDateTime.now())
+                .build();
+        ordersMapper.update(ordersUpdate);
     }
 
     private String getOrderDishes(Orders orders) {

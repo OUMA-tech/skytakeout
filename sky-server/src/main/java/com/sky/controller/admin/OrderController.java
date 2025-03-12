@@ -1,6 +1,9 @@
 package com.sky.controller.admin;
 
+import com.sky.dto.OrdersCancelDTO;
+import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrdersService;
@@ -42,5 +45,45 @@ public class OrderController {
         log.info("search order details:{}", id);
         OrderVO orderVO = ordersService.orderDetail(id);
         return Result.success(orderVO);
+    }
+
+    @PutMapping("/confirm")
+    @ApiOperation("confirm order")
+    public Result confirmOrder(@RequestBody OrdersDTO ordersDTO) {
+        log.info("confirm order:{}", ordersDTO);
+        ordersService.adminConfirmOrder(ordersDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/rejection")
+    @ApiOperation("reject order")
+    public Result rejectionOrder(@RequestBody OrdersRejectionDTO ordersRejectionDTO) {
+        log.info("reject order:{}", ordersRejectionDTO);
+        ordersService.adminRejectOrder(ordersRejectionDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/cancel")
+    @ApiOperation("cancel order")
+    public Result cancelOrder(@RequestBody OrdersCancelDTO ordersCancelDTO) {
+        log.info("cancel order:{}", ordersCancelDTO);
+        ordersService.adminCancelOrder(ordersCancelDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/delivery/{id}")
+    @ApiOperation("delivery order")
+    public Result deliveryOrder(@PathVariable Long id) {
+        log.info("delivery order:{}", id);
+        ordersService.adminDeliveryOrder(id);
+        return Result.success();
+    }
+
+    @PutMapping("/complete/{id}")
+    @ApiOperation("complete order")
+    public Result completeOrder(@PathVariable Long id) {
+        log.info("complete order:{}", id);
+        ordersService.adminCompleteOrder(id);
+        return Result.success();
     }
 }
