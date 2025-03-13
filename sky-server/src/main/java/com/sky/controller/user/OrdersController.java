@@ -1,9 +1,11 @@
 package com.sky.controller.user;
 
+import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrdersService;
+import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
@@ -58,6 +60,30 @@ public class OrdersController {
     public Result repetition(@PathVariable Long id) {
         log.info("repetition order:{}", id);
         ordersService.repetition(id);
+        return Result.success();
+    }
+
+    /**
+     * 订单支付
+     *
+     * @param ordersPaymentDTO
+     * @return
+     */
+    @PutMapping("/payment")
+    @ApiOperation("pay order")
+    public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
+        log.info("payment：{}", ordersPaymentDTO);
+        OrderPaymentVO orderPaymentVO = ordersService.payment(ordersPaymentDTO);
+        log.info("generate payment result：{}", orderPaymentVO);
+        return Result.success(orderPaymentVO);
+    }
+
+
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("reminder")
+    public Result reminder(@PathVariable Long id) {
+        log.info("reminder order:{}", id);
+        ordersService.reminder(id);
         return Result.success();
     }
 }

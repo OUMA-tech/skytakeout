@@ -45,6 +45,11 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+            <!--websocket dependency-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>redis.clients</groupId>-->
 <!--            <artifactId>jedis</artifactId>-->

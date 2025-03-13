@@ -31,7 +31,7 @@ public class OrderController {
         return Result.success(pageResult);
     }
 
-    @GetMapping("/statistcs")
+    @GetMapping("/statistics")
     @ApiOperation("statistics")
     public Result<OrderStatisticsVO> statistics() {
         log.info("statistics");
