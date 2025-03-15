@@ -13,6 +13,7 @@ import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DishMapper {
@@ -49,4 +50,6 @@ public interface DishMapper {
     @Select("select sd.name,sd.copies,d.image,d.descrepetion from setmeal_dish sd" +
             "left join dish d on sd.dish_id = d.id where sd.setmeal_id = #{setMealId}")
     List<DishItemVO> getDishItemById(Long setMealId);
+
+    Integer countByMap(Map map);
 }

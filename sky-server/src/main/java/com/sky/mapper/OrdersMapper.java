@@ -2,14 +2,13 @@ package com.sky.mapper;
 
 import com.github.pagehelper.Page;
 import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.entity.Orders;
-import com.sky.entity.TurnoverReport;
-import com.sky.entity.UserReport;
+import com.sky.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrdersMapper {
@@ -49,4 +48,33 @@ public interface OrdersMapper {
             "         JOIN user u ON o.user_id = u.id\n" +
             "GROUP BY o.order_date;")
     List<UserReport> countUser(LocalDateTime begin, LocalDateTime end, Integer status);
+
+    @Select("select\n" +
+            "    DATE(order_time) as date_list,\n" +
+            "    COUNT(*) as order_count_list,\n" +
+            "    COUNT(case when status = #{status} then 1 end) as valid_order_count_list\n" +
+            "from orders\n" +
+            "where order_time BETWEEN #{begin} AND #{end}\n" +
+            "group by date_list;")
+    List<OrderReport> ordersStatistics(LocalDateTime begin, LocalDateTime end, Integer status);
+
+    @Select("select count(*) from orders where order_time BETWEEN #{begin} AND #{end}")
+    Integer countAllByDate(LocalDateTime begin, LocalDateTime end);
+
+    @Select("select count(*) from orders where order_time BETWEEN #{begin} AND #{end} and status = #{status}")
+    Integer countByStatusAndDate(LocalDateTime begin, LocalDateTime end, Integer status);
+
+    @Select("select od.name as name_list, sum(od.number) as number_list\n" +
+            "FROM order_detail od\n" +
+            "         JOIN orders o ON od.order_id = o.id\n" +
+            "WHERE o.order_time BETWEEN #{begin} AND #{end} and status = #{status}\n" +
+            "group by name_list\n" +
+            "order by number_list desc\n" +
+            "limit 10;")
+    List<SalesTop10Report> countTop10Dishes(LocalDateTime begin, LocalDateTime end, Integer status);
+
+    Integer countByMap(Map map);
+
+    @Select("select sum(amount) from orders where order_time BETWEEN #{begin} AND #{end} and status = #{status}")
+    Double sumByMap(Map map);
 }

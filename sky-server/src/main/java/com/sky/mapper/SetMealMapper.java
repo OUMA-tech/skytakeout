@@ -11,6 +11,7 @@ import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface SetMealMapper {
@@ -41,4 +42,6 @@ public interface SetMealMapper {
     void setStatus(Integer status, Long id);
 
     List<SetMeal> list(SetMeal setMeal);
+
+    Integer countByMap(Map map);
 }
