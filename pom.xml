@@ -31,7 +31,6 @@
         <jaxb-api>2.3.1</jaxb-api>
         <poi>3.16</poi>
         <aws.s3>2.30.31</aws.s3>
-        <aws.sdk>2.20.131</aws.sdk>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -129,13 +128,6 @@
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
                 <version>${aws.s3}</version>
-            </dependency>
-
-            <!-- 需要 AWS SDK 的核心库 -->
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>aws-sdk-java</artifactId>
-                <version>${aws.sdk}</version>
             </dependency>
 
         </dependencies>

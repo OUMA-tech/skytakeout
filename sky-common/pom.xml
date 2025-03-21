@@ -56,11 +56,6 @@
             <artifactId>s3</artifactId>
         </dependency>
 
-        <!-- 需要 AWS SDK 的核心库 -->
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>aws-sdk-java</artifactId>
-        </dependency>
 
     </dependencies>
 </project>
