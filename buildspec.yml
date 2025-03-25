@@ -11,7 +11,7 @@ phases:
   install:
     runtime-versions:
       java: 17
-      docker: 20
+      docker: 25.0.8
     commands:
       - echo "Installing dependencies..."
 
