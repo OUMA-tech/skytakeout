@@ -17,8 +17,8 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - export AWS_ACCOUNT_ID=$(aws ssm get-parameter --name $AWS_ACCOUNT_ID --query 'Parameter.Value' --output text)
-      - export AWS_REGION=$(aws ssm get-parameter --name $AWS_REGION --query 'Parameter.Value' --output text)
+      - echo "AWS Region: $AWS_REGION"
+      - echo "AWS Account ID: $AWS_ACCOUNT_ID"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
