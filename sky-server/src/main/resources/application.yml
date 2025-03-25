@@ -7,8 +7,8 @@ spring:
   main:
     allow-circular-references: true
   datasource:
-    driver-class-name: ${sky.datasource.driver-class-name}
-    url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${sky.datasource.url}
     username: ${sky.datasource.username}
     password: ${sky.datasource.password}
   redis:
@@ -35,23 +35,14 @@ logging:
 
 sky:
   jwt:
-    # 设置jwt签名加密时使用的秘钥
-    admin-secret-key: itcast
-    # 设置jwt过期时间
-    admin-ttl: 7200000
-    # 设置前端传递过来的令牌名称
-    admin-token-name: token
-    user-secret-key: itheima
-    user-ttl: 7200000
-    user-token-name: authentication
+    admin-secret-key: ${sky.jwt.admin-secret-key}
+    admin-ttl: ${sky.jwt.admin-ttl}
+    admin-token-name: ${sky.jwt.admin-token-name}
+    user-secret-key: ${sky.jwt.user-secret-key}
+    user-ttl: ${sky.jwt.user-ttl}
+    user-token-name: ${sky.jwt.user-token-name}
 
   aws:
     s3:
       region: ${sky.aws.region}
-      access-key: ${sky.aws.access-key}
-      secret-key: ${sky.aws.secret-key}
       bucket-name: ${sky.aws.bucket-name}
-
-  wechat:
-    appid: ${sky.wechat.appid}
-    secret: ${sky.wechat.appsecret}

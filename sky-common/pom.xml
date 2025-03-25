@@ -5,7 +5,7 @@
     <parent>
         <artifactId>sky-take-out</artifactId>
         <groupId>com.sky</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>sky-common</artifactId>
@@ -56,11 +56,41 @@
             <artifactId>s3</artifactId>
         </dependency>
 
-        <!-- 需要 AWS SDK 的核心库 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>aws-sdk-java</artifactId>
+            <artifactId>netty-nio-client</artifactId>
+            <version>2.23.8</version>
+        </dependency>
+
+        <!-- 用于生成预签名URL -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+            <version>2.23.8</version>
+        </dependency>
+
+        <!-- Spring Boot依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+                <version>1.18.20.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>delombok</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
