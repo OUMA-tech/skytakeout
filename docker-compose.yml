@@ -23,7 +23,7 @@ services:
       - mysql-data:/var/lib/mysql
 
   sky-app:
-    image: sky-app:1.0.0
+    image: sky-app:1.0.1
     container_name: sky-app
     ports:
       - "8080:8080"

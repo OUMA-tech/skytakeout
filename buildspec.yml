@@ -18,6 +18,8 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
+      - export AWS_ACCOUNT_ID=$(aws ssm get-parameter --name $AWS_ACCOUNT_ID --query 'Parameter.Value' --output text)
+      - export AWS_REGION=$(aws ssm get-parameter --name $AWS_REGION --query 'Parameter.Value' --output text)
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
@@ -26,15 +28,13 @@ phases:
       - mvn clean package -DskipTests
       - echo "Building Docker image..."
       - docker build -t sky-app .
-      - VERSION=$CODEBUILD_BUILD_ID
+      - VERSION=$CODEBUILD_BUILD_NUMBER
       - docker tag sky-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
+      - docker tag sky-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
 
   post_build:
     commands:
       - echo "Pushing Docker image to Amazon ECR..."
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
       - echo "Build completed successfully!"
-
-artifacts:
-  files:
-    - target/*.jar
