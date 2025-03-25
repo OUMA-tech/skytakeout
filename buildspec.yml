@@ -1,9 +1,16 @@
 version: 0.2
 
+env:
+  variables:
+    ECR_REPOSITORY: "firstrepo/firtspace"
+  parameter-store:
+    AWS_ACCOUNT_ID: "/sky-app/aws-account-id"
+    AWS_REGION: "/sky-app/aws-region"
+
 phases:
   install:
     runtime-versions:
-      java: 11
+      java: 17
       docker: 20
     commands:
       - echo "Installing dependencies..."
@@ -18,13 +25,14 @@ phases:
       - echo "Building the application..."
       - mvn clean package -DskipTests
       - echo "Building Docker image..."
-      - docker build -t my-app .
-      - docker tag my-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-app:latest
+      - docker build -t sky-app .
+      - VERSION=$CODEBUILD_BUILD_ID
+      - docker tag sky-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
 
   post_build:
     commands:
       - echo "Pushing Docker image to Amazon ECR..."
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/my-app:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
       - echo "Build completed successfully!"
 
 artifacts:
