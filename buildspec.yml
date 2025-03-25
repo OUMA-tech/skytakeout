@@ -13,6 +13,9 @@ phases:
       java: 17
     commands:
       - echo "Installing dependencies..."
+      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+      - export PATH=$JAVA_HOME/bin:$PATH
+      - java -version
 
   pre_build:
     commands:
@@ -37,3 +40,5 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
       - echo "Build completed successfully!"
+      - echo "Cleaning up Docker credentials..."
+      - rm -f ~/.docker/config.json
