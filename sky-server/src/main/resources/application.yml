@@ -7,7 +7,7 @@ spring:
   main:
     allow-circular-references: true
   datasource:
-    driver-class-name: ${sky.datasource.driver-class-name}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${sky.datasource.url}
     username: ${sky.datasource.username}
     password: ${sky.datasource.password}
@@ -45,10 +45,4 @@ sky:
   aws:
     s3:
       region: ${sky.aws.region}
-      access-key: ${sky.aws.access-key}
-      secret-key: ${sky.aws.secret-key}
       bucket-name: ${sky.aws.bucket-name}
-
-  wechat:
-    appid: ${sky.wechat.appid}
-    secret: ${sky.wechat.appsecret}

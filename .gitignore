@@ -5,5 +5,5 @@ sky-server/src/main/resources/application-dev.yml
 *.class
 *Test.java
 **/test/
-application.env
+sky-app.env
 application-deploy.yml

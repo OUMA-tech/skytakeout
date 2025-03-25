@@ -12,29 +12,32 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
+    env_file: sky-app.env
     environment:
-      MYSQL_ROOT_PASSWORD: 0123
-      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
     ports:
       - "3306:3306"
     networks:
       - app-network
     volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
       - mysql-data:/var/lib/mysql
 
   sky-app:
-    image: sky-app:1.0-SNAPSHOT
+    image: sky-app:1.0.0
     container_name: sky-app
-    build:
-      context: .
     ports:
       - "8080:8080"
+    env_file: sky-app.env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mydb
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=0123
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+        SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+        SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+        SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+        SPRING_REDIS_HOST: ${SPRING_REDIS_HOST}
+        SPRING_REDIS_PORT: ${SPRING_REDIS_PORT}
+
     depends_on:
       - redis
       - mysql
@@ -44,3 +47,7 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mysql-data:
+

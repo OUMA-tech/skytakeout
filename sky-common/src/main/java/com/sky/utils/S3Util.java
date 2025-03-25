@@ -1,5 +1,6 @@
 package com.sky.utils;
 
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -38,14 +39,17 @@ public class S3Util {
     public S3Util(Region region, String bucketName) {
         this.s3Client = S3Client.builder()
                 .region(region)
+                .credentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
 
         this.s3AsyncClient = S3AsyncClient.builder()
                 .region(region)
+                .credentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
 
         this.s3Presigner = S3Presigner.builder()
                 .region(region)
+                .credentialsProvider(InstanceProfileCredentialsProvider.create())
                 .build();
 
         this.bucketName = bucketName;
