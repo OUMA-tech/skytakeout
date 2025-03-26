@@ -32,13 +32,11 @@ phases:
       - docker build -t sky-app .
       - VERSION=$CODEBUILD_BUILD_NUMBER
       - docker tag sky-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
-      - docker tag sky-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
 
   post_build:
     commands:
       - echo "Pushing Docker image to Amazon ECR..."
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:$VERSION
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/sky-app:latest
       - echo "Build completed successfully!"
       - echo "Cleaning up Docker credentials..."
       - rm -f ~/.docker/config.json
