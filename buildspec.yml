@@ -42,3 +42,8 @@ phases:
       - echo "Build completed successfully!"
       - echo "Cleaning up Docker credentials..."
       - rm -f ~/.docker/config.json
+cache:
+  paths:
+    - "/root/.m2/repository/**/*"
+  type: S3
+  location: "sky-app-codebuild/maven-cache"
