@@ -77,4 +77,10 @@ public interface OrdersMapper {
 
     @Select("select sum(amount) from orders where order_time BETWEEN #{begin} AND #{end} and status = #{status}")
     Double sumByMap(Map map);
+
+    @Select("select * from orders where session_id = #{sessionId}")
+    Orders getBySessionId(String sessionId);
+
+    @Select("select * from orders where number = #{orderNumber}")
+    Orders getByOrderNumber(String orderNumber);
 }

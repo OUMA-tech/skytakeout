@@ -18,6 +18,9 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import org.apache.commons.lang.RandomStringUtils;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
@@ -96,8 +99,6 @@ public class OrdersServiceImp implements OrdersService {
                 .orderNumber(orders.getNumber())
                 .orderAmount(orders.getAmount())
                 .build();
-
-
         return orderSubmitVO;
     }
 
@@ -186,10 +187,29 @@ public class OrdersServiceImp implements OrdersService {
      * @param ordersPaymentDTO
      * @return
      */
-    public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO)  {
+    public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws StripeException {
         // 当前登录用户id
         Long userId = BaseContext.getCurrentId();
         User user = userMapper.getById(userId);
+        Orders orders = ordersMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
+        if(!Objects.equals(orders.getStatus(), Orders.PENDING_PAYMENT)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // stripe create customer
+        CustomerCreateParams params =
+                CustomerCreateParams.builder()
+                        .setName("John Doe")
+                        .setAddress(
+                                CustomerCreateParams.Address.builder()
+                                        .setCountry("AU")
+                                        .setCity("San Fransisco")
+                                        .build()
+                        )
+                        .addPreferredLocale("EN")
+                        .addPreferredLocale("FR")
+                        .build();
+
+        Customer customer = Customer.create(params);
 
 //        //调用微信支付接口，生成预支付交易单
 //        JSONObject jsonObject = weChatPayUtil.pay(
@@ -391,6 +411,21 @@ public class OrdersServiceImp implements OrdersService {
 
         // using websocket send notify reminder to shop
         webSocketServer.sendToAllClient(JSON.toJSONString(map));
+    }
+
+    @Override
+    public void update(Orders orders) {
+        ordersMapper.update(orders);
+    }
+
+    @Override
+    public Orders getBySessionId(String sessionId) {
+        return ordersMapper.getBySessionId(sessionId);
+    }
+
+    @Override
+    public Orders getByOrderNumber(String orderNumber) {
+        return ordersMapper.getByOrderNumber(orderNumber);
     }
 
 }

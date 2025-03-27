@@ -61,6 +61,9 @@
             <if test="cancelTime != null">
                 cancel_time = #{cancelTime},
             </if>
+            <if test="sessionId != null">
+                session_id = #{sessionId},
+            </if>
         </set>
         where id = #{id}
     </update>

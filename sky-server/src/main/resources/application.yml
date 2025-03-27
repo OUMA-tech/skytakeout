@@ -1,7 +1,13 @@
 server:
   port: 8080
 
+
 spring:
+  mvc:
+    static-path-pattern: /resources/static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
   profiles:
     active: dev
   main:
@@ -46,3 +52,9 @@ sky:
     s3:
       region: ${sky.aws.region}
       bucket-name: ${sky.aws.bucket-name}
+  stripe:
+    secret-key: ${sky.stripe.secret-key}
+
+  wechat:
+    secret: ${sky.wechat.secret}
+    appid: ${sky.wechat.appid}

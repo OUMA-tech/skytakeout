@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success</title>
+</head>
+<body>
+<h1>Payment Successful!</h1>
+<p>Thank you for your purchase. Your payment was successful.</p>
+
+<div id="payment-details">
+    <p>Retrieving payment details...</p>
+</div>
+
+<script>
+    // 获取 URL 中的 session_id
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+
+    // 使用 sessionId 获取支付详情（需要后端支持）
+    fetch(`/payment/success?session_id=${sessionId}`)
+        .then(response => response.json())
+        .then(data => {
+            const paymentDetails = document.getElementById('payment-details');
+            if (data.success) {
+                paymentDetails.innerHTML = `
+                        <p>Payment ID: ${data.payment_id}</p>
+                        <p>Amount: $${data.amount / 100}</p>
+                        <p>Payment Status: ${data.status}</p>
+                    `;
+            } else {
+                paymentDetails.innerHTML = `<p>Payment failed to retrieve. Please contact support.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching payment details:', error);
+            document.getElementById('payment-details').innerHTML = `<p>There was an error retrieving the payment details.</p>`;
+        });
+</script>
+</body>
+</html>

@@ -36,7 +36,7 @@ public class UserController {
         log.info("wechat login：{} ", userLoginDTO.getCode());
 
         User user = userService.wxLogin(userLoginDTO);
-
+        log.info("user:{}", user);
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
