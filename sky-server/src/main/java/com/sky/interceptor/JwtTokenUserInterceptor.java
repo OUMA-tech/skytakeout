@@ -41,13 +41,21 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
 
         //1、从请求头中获取令牌
         String token = request.getHeader(jwtProperties.getUserTokenName());
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);  // 去掉 "Bearer " 前缀
+            // 处理 token
+        } else {
+            // token 不存在或格式不正确
+            throw new RuntimeException("Token not found or invalid.");
+        }
 
         //2、校验令牌
         try {
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+            log.info("claims:{}",claims);
             Long userId = Long.valueOf(claims.get(JwtClaimsConstant.USER_ID).toString());
-            log.info("当前员工id：", userId);
+            log.info("当前用户id：", userId);
             BaseContext.setCurrentId(userId);
             //3、通过，放行
             return true;

@@ -20,4 +20,7 @@ public interface UserMapper {
 
     @Select("SELECT COUNT(*) from user where create_time between #{begin} and #{end}")
     Integer countByMap(Map map);
+
+    @Select("select * from user where username = #{username}")
+    User getByOpenUsername(String username);
 }

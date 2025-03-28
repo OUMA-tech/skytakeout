@@ -2,6 +2,7 @@ package com.sky.controller.user;
 
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.UserLoginDTO;
+import com.sky.dto.UserRegisterDTO;
 import com.sky.entity.User;
 import com.sky.properties.JwtProperties;
 import com.sky.result.Result;
@@ -33,19 +34,27 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation("wechat login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO){
-        log.info("wechat login：{} ", userLoginDTO.getCode());
+        log.info("login：{} ", userLoginDTO);
 
-        User user = userService.wxLogin(userLoginDTO);
-        log.info("user:{}", user);
+        User user = userService.login(userLoginDTO);
+
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
-
+        log.info("token:{}", token);
         UserLoginVO userLoginVO = UserLoginVO.builder()
                 .id(user.getId())
-                .openid(user.getOpenid())
+                .username(user.getUsername())
                 .token(token)
                 .build();
         return Result.success(userLoginVO);
+    }
+
+    @PostMapping("/register")
+    @ApiOperation("user register")
+    public Result<String> register(@RequestBody UserRegisterDTO userRegisterDTO){
+        log.info("user register:{}", userRegisterDTO);
+        userService.userRegister(userRegisterDTO);
+        return Result.success();
     }
 }

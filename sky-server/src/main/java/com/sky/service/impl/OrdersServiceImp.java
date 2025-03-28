@@ -226,14 +226,8 @@ public class OrdersServiceImp implements OrdersService {
 //        vo.setPackageStr(jsonObject.getString("package"));
 
 //       Didn't implement payment system api with WeChatPayUtil, so I use fake VO
-        OrderPaymentVO vo = OrderPaymentVO.builder()
-                .nonceStr(String.valueOf(System.currentTimeMillis() / 1000))
-                .nonceStr(RandomStringUtils.randomNumeric(32))
-                .signType("RSA")
-                .paySign("dGVzdA==")
-                .packageStr("test")
-                .build();
-        return vo;
+
+        return null;
     }
 
 
