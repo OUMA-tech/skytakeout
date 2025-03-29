@@ -47,8 +47,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns("/user/user/**")
-                .excludePathPatterns("/user/shop/status")
-                .excludePathPatterns(("/user/checkout"));
+                .excludePathPatterns("/user/shop/status");
     }
 
     /**
@@ -110,6 +109,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // 允许 localhost:3000 请求
-        registry.addMapping("/user/**").allowedOrigins("http://localhost:3000");
+        registry.addMapping("/user/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
 }

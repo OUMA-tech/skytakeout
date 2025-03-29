@@ -7,12 +7,12 @@
                             order_time, checkout_time, pay_method, pay_status,
                             amount, remark, user_name, phone, address, consignee,
                             estimated_delivery_time, delivery_status,
-                            pack_amount, tableware_number, tableware_status)
+                            pack_amount, tableware_number, tableware_status, session_id)
         values
             (#{number}, #{status}, #{userId}, #{addressBookId}, #{orderTime}, #{checkoutTime},
              #{payMethod}, #{payStatus}, #{amount}, #{remark}, #{userName}, #{phone}, #{address},
              #{consignee}, #{estimatedDeliveryTime}, #{deliveryStatus}, #{packAmount}, #{tablewareNumber},
-             #{tablewareStatus})
+             #{tablewareStatus}, #{sessionId})
     </insert>
 
     <select id="pageQuery" resultType="com.sky.entity.Orders">

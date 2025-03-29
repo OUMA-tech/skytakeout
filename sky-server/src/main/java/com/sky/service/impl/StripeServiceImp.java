@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import com.sky.dto.OrdersPaymentDTO;
+import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.Orders;
 import com.sky.properties.StripeProperties;
 import com.sky.service.OrdersService;
@@ -34,13 +35,12 @@ public class StripeServiceImp implements StripeService {
     }
 
     @Override
-    public Session createCheckoutSession(OrdersPaymentDTO ordersPaymentDTO) {
-        Orders orders = ordersService.getByOrderNumber(ordersPaymentDTO.getOrderNumber());
+    public String createCheckoutSession(Long amount, String orderNumber, int payMethod) {
         try {
             // TODO need to replace the url when deployed
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("http://localhost:3000/payment/success?session_id={CHECKOUT_SESSION_ID}")
+                    .setSuccessUrl("http://localhost:3000/payment/success?session_id={CHECKOUT_SESSION_ID}&order_number=" + orderNumber + "&pay_method=" + payMethod)
                     .setCancelUrl("http://localhost:3000/payment/cancel")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
@@ -48,10 +48,10 @@ public class StripeServiceImp implements StripeService {
                                     .setPriceData(
                                             SessionCreateParams.LineItem.PriceData.builder()
                                                     .setCurrency("aud")
-                                                    .setUnitAmount(orders.getAmount().multiply(BigDecimal.valueOf(100)).longValue()) // 100元
+                                                    .setUnitAmount(amount) // A$100
                                                     .setProductData(
                                                             SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                    .setName("Order #" + orders.getNumber())
+                                                                    .setName("Order #" + orderNumber)
                                                                     .build()
                                                     )
                                                     .build()
@@ -60,23 +60,18 @@ public class StripeServiceImp implements StripeService {
                     )
                     .build();
 
-            Session session = Session.create(params);
-            Orders ordersUpdate = new Orders();
-            ordersUpdate.setSessionId(session.getId());
-            ordersUpdate.setId(orders.getId());
-            ordersService.update(ordersUpdate);
-            return session;
+            return Session.create(params).getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public OrderPaymentVO paymentDetails(String sessionId) {
-        Orders orders = ordersService.getBySessionId(sessionId);
+    public OrderPaymentVO paymentDetails(OrdersPaymentDTO ordersPaymentDTO) {
+        Orders orders = ordersService.getByOrderNumber(ordersPaymentDTO.getOrderNumber());
         try {
             // 使用 session_id 获取 Checkout Session 信息
-            Session session = Session.retrieve(sessionId);
+            Session session = Session.retrieve(ordersPaymentDTO.getSessionId());
 
             // 获取支付的详细信息
             long amount = session.getAmountTotal() / 100;  // 将金额转换为实际金额（单位是分）

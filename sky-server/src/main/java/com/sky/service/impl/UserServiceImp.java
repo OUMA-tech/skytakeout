@@ -24,12 +24,6 @@ public class UserServiceImp implements UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public static final String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
-    private final WeChatProperties weChatProperties;
-
-    public UserServiceImp(WeChatProperties weChatProperties) {
-        this.weChatProperties = weChatProperties;
-    }
 
     @Override
     public User login(UserLoginDTO userLoginDTO) {
@@ -63,16 +57,4 @@ public class UserServiceImp implements UserService {
         userMapper.insert(userInsert);
     }
 
-    private String getOpenId(String code){
-        // user weChat api
-        Map<String,String> map = new HashMap<>();
-        map.put("appid", weChatProperties.getAppid());
-        map.put("secret", weChatProperties.getSecret());
-        map.put("js_code", code);
-        map.put("grant_type", "authorization_code");
-        String json = HttpClientUtil.doGet(WX_LOGIN,map);
-
-        JSONObject jsonObject = JSONObject.parseObject(json);
-        return jsonObject.getString("openid");
-    }
 }

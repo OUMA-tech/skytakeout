@@ -5,6 +5,7 @@ import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrdersService;
+import com.sky.service.StripeService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
@@ -22,6 +23,8 @@ public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private StripeService stripeService;
 
     @PostMapping("/submit")
     @ApiOperation("submit order")
@@ -73,7 +76,7 @@ public class OrdersController {
     @ApiOperation("pay order")
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         log.info("payment：{}", ordersPaymentDTO);
-        OrderPaymentVO orderPaymentVO = ordersService.payment(ordersPaymentDTO);
+        OrderPaymentVO orderPaymentVO = stripeService.paymentDetails(ordersPaymentDTO);
         log.info("generate payment result：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
     }

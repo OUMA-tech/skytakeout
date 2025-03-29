@@ -11,4 +11,7 @@ public class OrdersPaymentDTO implements Serializable {
     //付款方式
     private Integer payMethod;
 
+    //sessionId
+    private String sessionId;
+
 }

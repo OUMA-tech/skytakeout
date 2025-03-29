@@ -17,7 +17,8 @@ public class OrderTask {
     private OrdersMapper ordersMapper;
 
     // checking order unpaid over 15 minutes
-    @Scheduled(cron = "0 * * * * ?") // every minute
+    // TODO switch back to 0 * * * * ?
+    @Scheduled(cron = "0 0 1 * * ?") // every minute
     public void autoCancelOrder(){
         log.info("auto cancel order if order unpaid over 15 minutes");
         LocalDateTime time = LocalDateTime.now().plusMinutes(-15);

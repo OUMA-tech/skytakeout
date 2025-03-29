@@ -13,6 +13,7 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrdersService;
+import com.sky.service.StripeService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.security.Signature;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,6 +50,8 @@ public class OrdersServiceImp implements OrdersService {
     private UserMapper userMapper;
     @Autowired
     private WebSocketServer webSocketServer;
+    @Autowired
+    private StripeService stripeService;
 
     @Override
     @Transactional
@@ -66,6 +70,12 @@ public class OrdersServiceImp implements OrdersService {
         if(shoppingCartList == null || shoppingCartList.isEmpty()) {
             throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
         }
+        // get stripe sessionId
+        String orderNumber = String.valueOf(System.currentTimeMillis());
+        long amount = ordersSubmitDTO.getAmount().multiply(BigDecimal.valueOf(100)).longValue()
+                + (long)ordersSubmitDTO.getPackAmount()
+                + (long) ordersSubmitDTO.getDeliverFee();
+        String sessionId = stripeService.createCheckoutSession(amount, orderNumber, ordersSubmitDTO.getPayMethod());
 
         // insert data to table orders
         Orders orders = new Orders();
@@ -73,11 +83,12 @@ public class OrdersServiceImp implements OrdersService {
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
         orders.setStatus(Orders.PENDING_PAYMENT);
-        orders.setNumber(String.valueOf(System.currentTimeMillis()));
+        orders.setNumber(orderNumber);
         orders.setAddress(addressBook.getDetail());
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(userId);
+        orders.setSessionId(sessionId);
 
         ordersMapper.insert(orders);
 
@@ -93,13 +104,14 @@ public class OrdersServiceImp implements OrdersService {
         // clean shopping cart
         cartMapper.clean(userId);
         // pack up return value
-        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
+
+        return OrderSubmitVO.builder()
                 .id(orders.getId())
                 .orderTime(orders.getOrderTime())
                 .orderNumber(orders.getNumber())
-                .orderAmount(orders.getAmount())
+                .orderAmount(BigDecimal.valueOf(amount))
+                .sessionId(sessionId)
                 .build();
-        return orderSubmitVO;
     }
 
     @Override
@@ -148,12 +160,9 @@ public class OrdersServiceImp implements OrdersService {
         if (orders.getStatus() > 2){
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
+        //        TODO refund logic
         // if the order is paid, need to refund it,
-        // but I don't have the payment system, so I just cancel it
-//        if (orders.getPayStatus() == Orders.PAID){
-//            // refund
-//            refund logic
-//        }
+
 
         Orders ordersUpdate = new Orders();
         ordersUpdate.setId(id);
@@ -284,7 +293,7 @@ public class OrdersServiceImp implements OrdersService {
         } else if (orders.getStatus() != 2) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
-        // deal with refund logic
+        // TODO deal with refund logic
 //        Integer payStatus = orders.getPayStatus();
 //        if (payStatus == Orders.PAID) {
 //
@@ -309,6 +318,7 @@ public class OrdersServiceImp implements OrdersService {
             // order status 1 waiting payment 2 waiting accept by shop 3 accepted 4 delivering 5 finished 6 canceled
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
+//        TODO refund logic
         Orders ordersUpdate = Orders.builder()
                 .id(ordersCancelDTO.getId())
                 .status(Orders.CANCELLED)
